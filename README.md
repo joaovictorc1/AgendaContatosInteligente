@@ -1,5 +1,5 @@
-Agenda de Contatos Inteligente (Aplicação Web)
-Sobre o Projeto
+#Agenda de Contatos Inteligente (Aplicação Web)
+##Sobre o Projeto
 
 Este projeto consiste em uma agenda de contatos completa, desenvolvida como uma aplicação web moderna para o Projeto Integrador do curso. A aplicação utiliza Python com o framework Flask para o backend e é conectada a um banco de dados PostgreSQL hospedado na nuvem (Neon), garantindo que os dados sejam persistentes e acessíveis de qualquer lugar.
 
@@ -66,10 +66,6 @@ cd
 
 # Crie e ative um ambiente virtual (altamente recomendado)
 python -m venv venv
-# No Windows:
-# venv\Scripts\activate
-# No macOS/Linux:
-# source venv/bin/activate
 
 # Instale todas as dependências necessárias
 pip install -r requirements.txt
@@ -98,8 +94,8 @@ Autores
 
     [João Victor Souza Cruz]
 
-    [Marcus Vinícius Braz ]
+    [Marcus Vinícius Braz Garcia]
 
-    [Felipe]
+    [Felipe Oliveira Cunha]
 
-    [Gabriell]
+    [Gabriell Pereira Pinto Guedes]
