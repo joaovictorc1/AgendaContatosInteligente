@@ -1,25 +1,21 @@
 # .gitignore
 
-# Arquivos de ambiente - NUNCA devem ir para o repositório!
-.env
-.env.*
-
-# Arquivos de banco de dados local (caso usem SQLite para testes)
+# Arquivos de banco de dados local SQLite
 *.db
 *.sqlite
 *.sqlite3
+agenda.db
 
 # Caches e arquivos compilados do Python
 __pycache__/
-*.py[cod]
-*$py.class
+*.pyc
+*.pyo
+*.pyd
 
 # Pastas de ambiente virtual
-.venv/
-venv/
-venv.bak/
-env/
-env.bak/
+.venv
+venv
+env
 
 # Arquivos de sistema operacional
 .DS_Store
