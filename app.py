@@ -1,11 +1,13 @@
 # app.py
 # Servidor web com Flask. Este é o único arquivo que você precisa executar.
+# Versão corrigida para conectar ao Neon/PostgreSQL.
 
 import sqlite3
 from flask import Flask, render_template, request, jsonify, session
 from datetime import timedelta
 
 # Importa os módulos de backend que já estavam prontos
+from database import db_manager
 import crud_contatos 
 import auth
 
@@ -21,7 +23,6 @@ app.permanent_session_lifetime = timedelta(days=1)
 @app.route('/')
 def index():
     """Renderiza a página HTML principal."""
-    # O Flask automaticamente procura por 'index.html' na pasta 'templates'
     return render_template('index.html')
 
 @app.route('/check_status')
@@ -39,7 +40,6 @@ def register():
     password = data.get('password')
     email = data.get('email')
     
-    # Usa a função do módulo 'auth' que já existia
     success, message = auth.auth_manager.register_user(username, password, email)
     
     return jsonify({'success': success, 'message': message})
@@ -51,11 +51,9 @@ def login():
     username = data.get('username')
     password = data.get('password')
     
-    # Usa a função do módulo 'auth' que já existia
     success, message = auth.auth_manager.login_user(username, password)
     
     if success:
-        # Se o login for bem-sucedido, salva o usuário na sessão do navegador
         session.permanent = True
         session['user'] = auth.auth_manager.get_current_user()
         return jsonify({'success': True, 'user': session['user']})
@@ -65,8 +63,8 @@ def login():
 @app.route('/logout')
 def logout():
     """Endpoint para fazer logout."""
-    auth.auth_manager.logout_user()
-    session.pop('user', None) # Remove o usuário da sessão
+    # A classe AuthManager não tem mais o método logout_user, a lógica agora é só limpar a sessão.
+    session.pop('user', None)
     return jsonify({'success': True})
 
 # --- API para os Contatos (CRUD) ---
@@ -86,8 +84,6 @@ def get_contact(contact_id):
     if 'user' not in session:
         return jsonify({'success': False, 'message': 'Não autorizado'}), 401
     
-    # Esta função não existia, mas é simples de deduzir. Vamos assumir que ela busca um por id.
-    # Para simplificar, vou buscar todos e filtrar. Numa app real, faríamos uma query específica.
     contacts = crud_contatos.obter_contatos()
     contact = next((c for c in contacts if c['id'] == contact_id), None)
     
@@ -112,7 +108,6 @@ def update_contact(contact_id):
         return jsonify({'success': False, 'message': 'Não autorizado'}), 401
     
     data = request.get_json()
-    # Para atualizar, precisamos do telefone antigo para encontrar o registro
     contacts = crud_contatos.obter_contatos()
     contact_original = next((c for c in contacts if c['id'] == contact_id), None)
     if not contact_original:
@@ -132,7 +127,6 @@ def delete_contact(contact_id):
     if 'user' not in session:
         return jsonify({'success': False, 'message': 'Não autorizado'}), 401
         
-    # Para deletar, precisamos do telefone para encontrar o registro
     contacts = crud_contatos.obter_contatos()
     contact_to_delete = next((c for c in contacts if c['id'] == contact_id), None)
     if not contact_to_delete:
@@ -144,18 +138,19 @@ def delete_contact(contact_id):
 
 # --- Ponto de Entrada da Aplicação ---
 if __name__ == '__main__':
-    # Inicializa o banco de dados (cria o arquivo agenda.db e as tabelas)
-    from database import init_database
+    # CORREÇÃO APLICADA AQUI:
+    # Em vez de importar 'init_database', importamos o objeto 'db_manager'
+    # e chamamos seu método de inicialização.
     try:
-        init_database()
+        db_manager.init_connection_pool()
     except Exception as e:
         print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         print(f"ERRO CRÍTICO AO INICIALIZAR BANCO DE DADOS: {e}")
-        print("O programa não pode continuar.")
+        print("Verifique sua internet e a configuração do arquivo .env")
+        print("Se o erro for 'permission denied', execute o comando GRANT no SQL Editor do Neon.")
         print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-        exit() # Encerra se o banco não puder ser criado.
+        exit()
 
     # Inicia o servidor web
-    # debug=True faz com que o servidor reinicie automaticamente quando você salva o arquivo.
     app.run(debug=True, port=5000)
 

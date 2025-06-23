@@ -1,2 +1,7 @@
+# requirements.txt
+# Dependências para a versão web com banco de dados Neon/PostgreSQL
+
 Flask
 bcrypt
+psycopg2-binary
+python-dotenv

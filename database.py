@@ -1,57 +1,95 @@
 # database.py
-# Versão simplificada que usa um banco de dados local SQLite.
-# Não precisa de internet, .env ou senhas. Funciona em qualquer máquina.
+# Gerencia a conexão com o banco de dados PostgreSQL (Neon) usando um pool
+# e cuida da criação inicial das tabelas.
 
-import sqlite3
+import os
+import psycopg2
+from psycopg2 import pool
+from dotenv import load_dotenv
 
-DB_FILE = "agenda.db"
+# Carrega as variáveis de ambiente do arquivo .env
+load_dotenv()
 
-def get_db_connection():
-    """Cria e retorna uma conexão com o arquivo de banco de dados local."""
-    conn = sqlite3.connect(DB_FILE)
-    # Permite acessar colunas pelo nome, como um dicionário.
-    conn.row_factory = sqlite3.Row
-    return conn
-
-def init_database():
-    """
-    Inicializa o banco de dados, criando as tabelas 'usuarios' e 'contatos'
-    se elas ainda não existirem. É chamada uma vez quando o programa inicia.
-    """
-    print("INFO: Verificando e inicializando banco de dados local (SQLite)...")
-    conn = get_db_connection()
-    try:
-        with conn: # 'with' gerencia o commit e rollback automaticamente
-            # Tabela de usuários para o sistema de login
-            conn.execute("""
-            CREATE TABLE IF NOT EXISTS usuarios (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username TEXT UNIQUE NOT NULL,
-                password_hash TEXT NOT NULL,
-                email TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-            """)
+class DatabaseManager:
+    """Gerenciador de pool de conexões com o banco de dados PostgreSQL."""
+    def __init__(self):
+        self.connection_pool = None
+    
+    def init_connection_pool(self):
+        """Inicializa o pool de conexões. Lança uma exceção detalhada em caso de falha."""
+        if self.connection_pool:
+            return
             
-            # Tabela de contatos
-            conn.execute("""
-            CREATE TABLE IF NOT EXISTS contatos (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                nome TEXT NOT NULL,
-                telefone TEXT UNIQUE NOT NULL,
-                email TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-            """)
-            print("INFO: Banco de dados pronto para uso.")
-    except Exception as e:
-        print(f"ERRO_CRITICO: Não foi possível criar as tabelas: {e}")
-        # Se não conseguir criar as tabelas, o programa não pode continuar.
-        raise
-    finally:
-        conn.close()
+        try:
+            connection_string = os.getenv('DATABASE_URL')
+            if not connection_string:
+                raise ValueError("Variável 'DATABASE_URL' não encontrada ou está vazia no arquivo .env.")
+            
+            print("INFO: Tentando criar pool de conexões com o PostgreSQL...")
+            self.connection_pool = pool.SimpleConnectionPool(
+                minconn=1, maxconn=10, dsn=connection_string
+            )
+            print("INFO: Pool de conexões criado com sucesso.")
+            
+            print("INFO: Verificando e criando tabelas, se necessário...")
+            conn = self.get_connection()
+            try:
+                self._create_tables_if_not_exists(conn)
+            finally:
+                self.return_connection(conn)
+            
+        except (psycopg2.OperationalError, ValueError) as e:
+            print(f"ERRO_CRITICO: Falha ao inicializar a conexão com o banco de dados: {e}")
+            self.connection_pool = None
+            raise 
 
-# Instância global do gerenciador (simplificado)
-# Agora só contém a função de inicialização
-db_initializer = init_database
+    def get_connection(self):
+        """Obtém uma conexão do pool."""
+        if not self.connection_pool:
+            raise Exception("O pool de conexões não foi inicializado.")
+        return self.connection_pool.getconn()
+
+    def return_connection(self, conn):
+        """Devolve uma conexão ao pool."""
+        if self.connection_pool and conn:
+            self.connection_pool.putconn(conn)
+    
+    def _create_tables_if_not_exists(self, conn):
+        """Cria as tabelas `usuarios` e `contatos` usando uma conexão já existente."""
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""
+                CREATE TABLE IF NOT EXISTS usuarios (
+                    id SERIAL PRIMARY KEY,
+                    username VARCHAR(80) UNIQUE NOT NULL,
+                    password_hash VARCHAR(255) NOT NULL,
+                    email VARCHAR(120),
+                    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+                );
+                """)
+                
+                cur.execute("""
+                CREATE TABLE IF NOT EXISTS contatos (
+                    id SERIAL PRIMARY KEY,
+                    nome VARCHAR(255) NOT NULL,
+                    telefone VARCHAR(50) UNIQUE NOT NULL,
+                    email VARCHAR(255),
+                    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+                    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+                );
+                """)
+                conn.commit()
+                print("INFO: Tabelas 'usuarios' e 'contatos' verificadas/criadas.")
+        except Exception as e:
+            print(f"ERRO: Não foi possível criar/verificar as tabelas: {e}")
+            conn.rollback()
+            raise
+    
+    def close_all_connections(self):
+        """Fecha todas as conexões do pool."""
+        if self.connection_pool:
+            self.connection_pool.closeall()
+            print("INFO: Todas as conexões com o banco foram fechadas.")
+
+# Instância global
+db_manager = DatabaseManager()
