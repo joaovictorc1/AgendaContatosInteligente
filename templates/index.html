@@ -147,15 +147,9 @@
     <div id="toast" class="toast"></div>
     
     <script>
-    // Todo o JavaScript da aplicação.
     document.addEventListener('DOMContentLoaded', () => {
-        // ... (o script continua abaixo) ...
         const app = {
-            // Elementos da UI
-            views: {
-                auth: document.getElementById('auth-view'),
-                agenda: document.getElementById('agenda-view'),
-            },
+            views: { auth: document.getElementById('auth-view'), agenda: document.getElementById('agenda-view') },
             auth: {
                 loginForm: document.getElementById('login-form'),
                 registerForm: document.getElementById('register-form'),
@@ -184,15 +178,9 @@
             },
             toast: document.getElementById('toast'),
 
-            // Função para fazer chamadas à API
             async apiCall(endpoint, method = 'GET', body = null) {
-                const options = {
-                    method,
-                    headers: { 'Content-Type': 'application/json' },
-                };
-                if (body) {
-                    options.body = JSON.stringify(body);
-                }
+                const options = { method, headers: { 'Content-Type': 'application/json' } };
+                if (body) { options.body = JSON.stringify(body); }
                 try {
                     const response = await fetch(endpoint, options);
                     return await response.json();
@@ -203,7 +191,6 @@
                 }
             },
 
-            // Funções de inicialização
             init() {
                 this.bindAuthEvents();
                 this.bindAgendaEvents();
@@ -216,11 +203,8 @@
                     const username = this.auth.loginUsername.value;
                     const password = this.auth.loginPassword.value;
                     const data = await this.apiCall('/login', 'POST', { username, password });
-                    if (data.success) {
-                        this.showAgendaView(data.user);
-                    } else {
-                        this.showAuthError(data.message);
-                    }
+                    if (data.success) { this.showAgendaView(data.user); } 
+                    else { this.showAuthError(data.message); }
                 });
 
                 this.auth.registerForm.addEventListener('submit', async (e) => {
@@ -235,9 +219,7 @@
                         this.auth.registerForm.reset();
                         this.auth.loginForm.reset();
                         this.auth.loginUsername.value = username;
-                    } else {
-                        this.showToast(data.message, 'error');
-                    }
+                    } else { this.showToast(data.message, 'error'); }
                 });
 
                 this.auth.showRegisterBtn.addEventListener('click', () => this.toggleRegisterForm(true));
@@ -258,16 +240,23 @@
                         telefone: this.agenda.contactPhone.value,
                         email: this.agenda.contactEmail.value,
                     };
-
-                    if (id) { // Editando
-                        const data = await this.apiCall(`/api/contacts/${id}`, 'PUT', contactData);
-                        this.showToast(data.message, data.success ? 'success' : 'error');
-                    } else { // Adicionando
-                        const data = await this.apiCall('/api/contacts', 'POST', contactData);
-                         this.showToast(data.message, data.success ? 'success' : 'error');
+                    
+                    // =============================================================
+                    // AQUI ESTÁ A CORREÇÃO PRINCIPAL DO BUG
+                    // A variável 'data' agora é declarada com 'let' fora do if/else,
+                    // garantindo que ela exista no escopo correto.
+                    // =============================================================
+                    let data; 
+                    if (id) {
+                        data = await this.apiCall(`/api/contacts/${id}`, 'PUT', contactData);
+                    } else {
+                        data = await this.apiCall('/api/contacts', 'POST', contactData);
                     }
                     
-                    if (data.success){
+                    this.showToast(data.message, data.success ? 'success' : 'error');
+                    
+                    // Esta verificação agora funciona, pois 'data' está acessível.
+                    if (data.success) {
                          this.resetForm();
                          this.loadContacts();
                     }
@@ -276,43 +265,25 @@
                 this.agenda.cancelEditBtn.addEventListener('click', () => this.resetForm());
             },
 
-            // Lógica de visualização
-            showAuthView() {
-                this.views.auth.classList.remove('hidden');
-                this.views.agenda.classList.add('hidden');
-            },
-
+            showAuthView() { this.views.auth.classList.remove('hidden'); this.views.agenda.classList.add('hidden'); },
             showAgendaView(user) {
                 this.views.agenda.classList.remove('hidden');
                 this.views.auth.classList.add('hidden');
                 this.agenda.currentUser.textContent = user.username;
                 this.loadContacts();
             },
-            
-            showAuthError(message) {
-                this.auth.authErrorMessage.textContent = message;
-                this.auth.authError.classList.remove('hidden');
-            },
-
+            showAuthError(message) { this.auth.authErrorMessage.textContent = message; this.auth.authError.classList.remove('hidden'); },
             toggleRegisterForm(show) {
-                if (show) {
-                    this.auth.loginForm.classList.add('hidden');
-                    this.auth.registerForm.classList.remove('hidden');
-                    this.auth.showRegisterBtn.parentElement.classList.add('hidden');
-                } else {
-                    this.auth.loginForm.classList.remove('hidden');
-                    this.auth.registerForm.classList.add('hidden');
-                    this.auth.showRegisterBtn.parentElement.classList.remove('hidden');
-                }
+                this.auth.loginForm.classList.toggle('hidden', show);
+                this.auth.registerForm.classList.toggle('hidden', !show);
+                this.auth.showRegisterBtn.parentElement.classList.toggle('hidden', show);
             },
             
-            // Lógica da Agenda
             async loadContacts() {
                 const data = await this.apiCall('/api/contacts');
-                this.agenda.contactList.innerHTML = ''; // Limpa a lista
-                
+                this.agenda.contactList.innerHTML = '';
+                this.agenda.noContactsMsg.classList.toggle('hidden', !data.success || data.contacts.length > 0);
                 if (data.success && data.contacts.length > 0) {
-                    this.agenda.noContactsMsg.classList.add('hidden');
                     data.contacts.forEach(contact => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
@@ -322,14 +293,10 @@
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 <button data-id="${contact.id}" class="edit-btn text-indigo-600 hover:text-indigo-900 mr-4">Editar</button>
                                 <button data-id="${contact.id}" data-name="${contact.nome}" class="delete-btn text-red-600 hover:text-red-900">Excluir</button>
-                            </td>
-                        `;
+                            </td>`;
                         this.agenda.contactList.appendChild(row);
                     });
-                } else {
-                    this.agenda.noContactsMsg.classList.remove('hidden');
                 }
-
                 this.bindTableButtons();
             },
 
@@ -345,11 +312,10 @@
                             this.agenda.contactPhone.value = data.contact.telefone;
                             this.agenda.contactEmail.value = data.contact.email || '';
                             this.agenda.cancelEditBtn.classList.remove('hidden');
-                            window.scrollTo(0, 0);
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
                         }
                     });
                 });
-
                 document.querySelectorAll('.delete-btn').forEach(button => {
                     button.addEventListener('click', async (e) => {
                         const id = e.target.dataset.id;
@@ -372,22 +338,16 @@
 
             async checkLoginStatus() {
                 const data = await this.apiCall('/check_status');
-                if (data.logged_in) {
-                    this.showAgendaView(data.user);
-                } else {
-                    this.showAuthView();
-                }
+                if (data.logged_in) { this.showAgendaView(data.user); } 
+                else { this.showAuthView(); }
             },
             
             showToast(message, type = 'success') {
                 this.toast.textContent = message;
                 this.toast.className = `toast ${type} show`;
-                setTimeout(() => {
-                    this.toast.classList.remove('show');
-                }, 3000);
+                setTimeout(() => { this.toast.classList.remove('show'); }, 3000);
             },
         };
-
         app.init();
     });
     </script>
