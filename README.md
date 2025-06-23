@@ -6,7 +6,6 @@ Este projeto consiste em uma agenda de contatos completa, desenvolvida como uma 
 A interface do usuário foi construída com HTML e Tailwind CSS, resultando em um design limpo, responsivo e com um elegante tema escuro padrão.
 
 
-(Dica: Tire um print da sua aplicação rodando e substitua o link acima para exibir a imagem aqui.)
 Funcionalidades Principais
 
     Autenticação de Usuários: Sistema de login completo com registro de novas contas e criptografia de senhas (bcrypt) para garantir a segurança.
@@ -60,10 +59,10 @@ Siga os passos abaixo para rodar o projeto em um ambiente local.
 2. Configuração do Ambiente:
 
 # Clone o repositório para a sua máquina
-git clone https://github.com/seu-usuario/nome-do-projeto.git
+git clone 
 
 # Navegue até a pasta do projeto
-cd nome-do-projeto
+cd 
 
 # Crie e ative um ambiente virtual (altamente recomendado)
 python -m venv venv
