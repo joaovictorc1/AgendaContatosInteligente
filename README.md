@@ -6,7 +6,7 @@ Este projeto consiste em uma agenda de contatos completa, desenvolvida como uma 
 A interface do usuário foi construída com HTML e Tailwind CSS, resultando em um design limpo, responsivo e com um elegante tema escuro padrão.
 
 
-Funcionalidades Principais
+## Funcionalidades Principais
 
     Autenticação de Usuários: Sistema de login completo com registro de novas contas e criptografia de senhas (bcrypt) para garantir a segurança.
 
@@ -20,7 +20,7 @@ Funcionalidades Principais
 
     Persistência de Dados na Nuvem: Utiliza um banco de dados PostgreSQL (Neon) para armazenar todas as informações de forma segura e online.
 
-Estrutura do Projeto
+## Estrutura do Projeto
 
 O código é modularizado para facilitar a manutenção e o entendimento:
 
@@ -36,7 +36,7 @@ O código é modularizado para facilitar a manutenção e o entendimento:
 
     estruturas.py: Implementa uma Lista Encadeada, cumprindo um dos requisitos acadêmicos da disciplina de Estrutura de Dados.
 
-Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
     Backend: Python 3, Flask
 
@@ -46,51 +46,51 @@ Tecnologias Utilizadas
 
     Bibliotecas Python: psycopg2-binary, bcrypt, python-dotenv
 
-Como Executar
+## Como Executar
 
 Siga os passos abaixo para rodar o projeto em um ambiente local.
 
-1. Pré-requisitos:
+    1. Pré-requisitos:
+    
+        Python 3.8+
+    
+        Git
+    
+    2. Configuração do Ambiente:
+    
+    # Clone o repositório para a sua máquina
+    git clone 
+    
+    # Navegue até a pasta do projeto
+    cd 
+    
+    # Crie e ative um ambiente virtual (altamente recomendado)
+    python -m venv venv
+    
+    # Instale todas as dependências necessárias
+    pip install -r requirements.txt
+    
+    3. Configure o Banco de Dados:
+    
+        Crie um arquivo chamado .env na pasta raiz do projeto.
+    
+        Dentro deste arquivo, adicione uma única linha com a sua URL de conexão do Neon:
+    
+        DATABASE_URL="sua_url_de_conexao_do_neon_aqui"
+    
+    4. Execute a Aplicação:
+    
+    python app.py
+    
+    5. Acesse no Navegador:
+    
+        Após executar o comando, o servidor estará rodando.
+    
+        Abra seu navegador de internet e acesse o seguinte endereço: http://127.0.0.1:5000
+    
+        A interface da agenda de contatos será exibida.
 
-    Python 3.8+
-
-    Git
-
-2. Configuração do Ambiente:
-
-# Clone o repositório para a sua máquina
-git clone 
-
-# Navegue até a pasta do projeto
-cd 
-
-# Crie e ative um ambiente virtual (altamente recomendado)
-python -m venv venv
-
-# Instale todas as dependências necessárias
-pip install -r requirements.txt
-
-3. Configure o Banco de Dados:
-
-    Crie um arquivo chamado .env na pasta raiz do projeto.
-
-    Dentro deste arquivo, adicione uma única linha com a sua URL de conexão do Neon:
-
-    DATABASE_URL="sua_url_de_conexao_do_neon_aqui"
-
-4. Execute a Aplicação:
-
-python app.py
-
-5. Acesse no Navegador:
-
-    Após executar o comando, o servidor estará rodando.
-
-    Abra seu navegador de internet e acesse o seguinte endereço: http://127.0.0.1:5000
-
-    A interface da agenda de contatos será exibida.
-
-Autores
+## Autores
 
     [João Victor Souza Cruz]
 
