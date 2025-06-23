@@ -35,16 +35,14 @@
 
     <div id="app" class="w-full max-w-4xl mx-auto p-4">
 
-        <!-- TELA DE LOGIN / REGISTRO -->
+        <!-- TELA DE LOGIN (sem alterações) -->
         <div id="auth-view" class="bg-white p-8 rounded-2xl shadow-lg max-w-md mx-auto">
             <h2 class="text-3xl font-bold text-center text-gray-800 mb-2">Agenda de Contatos</h2>
             <p class="text-center text-gray-500 mb-8">Faça login ou registre-se para continuar</p>
-            
             <div id="auth-error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-6 hidden" role="alert">
                 <strong class="font-bold">Erro:</strong>
                 <span class="block sm:inline" id="auth-error-message"></span>
             </div>
-
             <form id="login-form">
                 <div>
                     <label for="login-username" class="block text-sm font-medium text-gray-700">Usuário</label>
@@ -64,14 +62,12 @@
                     </button>
                 </div>
             </form>
-
             <p class="mt-4 text-center text-sm text-gray-600">
                 Não tem uma conta?
                 <button id="show-register-btn" class="font-medium text-indigo-600 hover:text-indigo-500">
                     Registre-se
                 </button>
             </p>
-
             <form id="register-form" class="hidden mt-6">
                  <div>
                     <label for="register-username" class="block text-sm font-medium text-gray-700">Novo Usuário</label>
@@ -110,7 +106,7 @@
             
             <main class="bg-white p-6 rounded-b-2xl shadow-lg">
                 <!-- FORMULÁRIO DE ADICIONAR/EDITAR -->
-                <form id="contact-form" class="mb-8 p-4 border border-gray-200 rounded-lg">
+                <form id="contact-form" class="mb-6 p-4 border border-gray-200 rounded-lg">
                     <h3 id="form-title" class="text-lg font-semibold mb-4 text-gray-800">Adicionar Novo Contato</h3>
                     <input type="hidden" id="contact-id">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -124,6 +120,12 @@
                     </div>
                 </form>
 
+                <!-- CAMPO DE BUSCA ADICIONADO AQUI -->
+                <div class="mb-4">
+                    <label for="search-box" class="sr-only">Buscar</label>
+                    <input type="search" id="search-box" placeholder="🔎 Buscar por nome ou telefone..." class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+
                 <!-- LISTA DE CONTATOS -->
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
@@ -136,7 +138,6 @@
                             </tr>
                         </thead>
                         <tbody id="contact-list" class="bg-white divide-y divide-gray-200">
-                            <!-- Contatos serão inseridos aqui pelo JavaScript -->
                         </tbody>
                     </table>
                      <p id="no-contacts" class="text-center py-8 text-gray-500 hidden">Nenhum contato encontrado.</p>
@@ -149,6 +150,7 @@
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         const app = {
+            // ... (elementos da UI como antes) ...
             views: { auth: document.getElementById('auth-view'), agenda: document.getElementById('agenda-view') },
             auth: {
                 loginForm: document.getElementById('login-form'),
@@ -173,10 +175,12 @@
                 contactPhone: document.getElementById('contact-phone'),
                 contactEmail: document.getElementById('contact-email'),
                 cancelEditBtn: document.getElementById('cancel-edit-btn'),
+                searchBox: document.getElementById('search-box'), // Elemento de busca
                 contactList: document.getElementById('contact-list'),
                 noContactsMsg: document.getElementById('no-contacts'),
             },
             toast: document.getElementById('toast'),
+            searchTimeout: null, // Para controle do debounce da busca
 
             async apiCall(endpoint, method = 'GET', body = null) {
                 const options = { method, headers: { 'Content-Type': 'application/json' } };
@@ -185,7 +189,6 @@
                     const response = await fetch(endpoint, options);
                     return await response.json();
                 } catch (error) {
-                    console.error('API Call Error:', error);
                     this.showToast('Erro de conexão com o servidor.', 'error');
                     return { success: false, message: 'Erro de conexão.' };
                 }
@@ -198,6 +201,7 @@
             },
 
             bindAuthEvents() {
+                // ... (eventos de autenticação como antes) ...
                 this.auth.loginForm.addEventListener('submit', async (e) => {
                     e.preventDefault();
                     const username = this.auth.loginUsername.value;
@@ -227,6 +231,7 @@
             },
 
             bindAgendaEvents() {
+                // ... (eventos de logout e formulário de contato como antes) ...
                 this.agenda.logoutBtn.addEventListener('click', async () => {
                     await this.apiCall('/logout');
                     this.showAuthView();
@@ -240,22 +245,10 @@
                         telefone: this.agenda.contactPhone.value,
                         email: this.agenda.contactEmail.value,
                     };
-                    
-                    // =============================================================
-                    // AQUI ESTÁ A CORREÇÃO PRINCIPAL DO BUG
-                    // A variável 'data' agora é declarada com 'let' fora do if/else,
-                    // garantindo que ela exista no escopo correto.
-                    // =============================================================
                     let data; 
-                    if (id) {
-                        data = await this.apiCall(`/api/contacts/${id}`, 'PUT', contactData);
-                    } else {
-                        data = await this.apiCall('/api/contacts', 'POST', contactData);
-                    }
-                    
+                    if (id) { data = await this.apiCall(`/api/contacts/${id}`, 'PUT', contactData); } 
+                    else { data = await this.apiCall('/api/contacts', 'POST', contactData); }
                     this.showToast(data.message, data.success ? 'success' : 'error');
-                    
-                    // Esta verificação agora funciona, pois 'data' está acessível.
                     if (data.success) {
                          this.resetForm();
                          this.loadContacts();
@@ -263,6 +256,15 @@
                 });
 
                 this.agenda.cancelEditBtn.addEventListener('click', () => this.resetForm());
+
+                // --- EVENTO DE BUSCA ADICIONADO ---
+                this.agenda.searchBox.addEventListener('input', () => {
+                    clearTimeout(this.searchTimeout); // Cancela a busca anterior se o usuário ainda está digitando
+                    // Espera 300ms após o usuário parar de digitar para fazer a busca
+                    this.searchTimeout = setTimeout(() => {
+                        this.loadContacts(this.agenda.searchBox.value);
+                    }, 300);
+                });
             },
 
             showAuthView() { this.views.auth.classList.remove('hidden'); this.views.agenda.classList.add('hidden'); },
@@ -279,10 +281,19 @@
                 this.auth.showRegisterBtn.parentElement.classList.toggle('hidden', show);
             },
             
-            async loadContacts() {
-                const data = await this.apiCall('/api/contacts');
+            // --- LÓGICA DE CARREGAR CONTATOS ATUALIZADA ---
+            async loadContacts(query = '') {
+                // A URL agora pode incluir um parâmetro de busca
+                const url = query ? `/api/contacts?q=${encodeURIComponent(query)}` : '/api/contacts';
+                const data = await this.apiCall(url);
+                
+                this.renderContactList(data);
+            },
+
+            renderContactList(data) {
                 this.agenda.contactList.innerHTML = '';
                 this.agenda.noContactsMsg.classList.toggle('hidden', !data.success || data.contacts.length > 0);
+
                 if (data.success && data.contacts.length > 0) {
                     data.contacts.forEach(contact => {
                         const row = document.createElement('tr');
@@ -301,6 +312,7 @@
             },
 
             bindTableButtons() {
+                // ... (binds dos botões de editar/excluir como antes) ...
                 document.querySelectorAll('.edit-btn').forEach(button => {
                     button.addEventListener('click', async (e) => {
                         const id = e.target.dataset.id;
@@ -323,7 +335,8 @@
                         if (confirm(`Tem certeza que deseja excluir ${name}?`)) {
                             const data = await this.apiCall(`/api/contacts/${id}`, 'DELETE');
                             this.showToast(data.message, data.success ? 'success' : 'error');
-                            this.loadContacts();
+                            // Após deletar, recarrega a lista com o termo de busca atual
+                            this.loadContacts(this.agenda.searchBox.value);
                         }
                     });
                 });

@@ -1,6 +1,6 @@
 # app.py
-# CORREÇÃO: As rotas da API agora pegam o ID do usuário da sessão
-# e o passam para as funções do backend.
+# CORREÇÃO: Adicionada a nova rota '/api/contacts/search' para
+# receber os pedidos de busca da interface.
 
 from flask import Flask, render_template, request, jsonify, session
 from datetime import timedelta
@@ -47,7 +47,6 @@ def logout():
 # --- API para os Contatos (com alterações) ---
 
 def get_current_user_id():
-    """Função auxiliar para pegar o user_id da sessão."""
     return session.get('user', {}).get('id')
 
 @app.route('/api/contacts', methods=['GET'])
@@ -55,8 +54,14 @@ def get_contacts():
     user_id = get_current_user_id()
     if not user_id: return jsonify({'success': False, 'message': 'Não autorizado'}), 401
     
-    # Passa o user_id para a função do backend.
-    contacts = crud_contatos.obter_contatos(user_id)
+    # --- ROTA DE BUSCA ADICIONADA ---
+    # Verifica se há um parâmetro de busca na URL
+    search_query = request.args.get('q')
+    if search_query:
+        contacts = crud_contatos.buscar_contatos(user_id, search_query)
+    else:
+        contacts = crud_contatos.obter_contatos(user_id)
+
     return jsonify({'success': True, 'contacts': contacts})
 
 @app.route('/api/contacts/<int:contact_id>', methods=['GET'])
@@ -64,8 +69,6 @@ def get_contact(contact_id):
     user_id = get_current_user_id()
     if not user_id: return jsonify({'success': False, 'message': 'Não autorizado'}), 401
     
-    # Para buscar um contato, primeiro pegamos todos os contatos do usuário
-    # e depois filtramos pelo ID.
     contacts = crud_contatos.obter_contatos(user_id)
     contact = next((c for c in contacts if c['id'] == contact_id), None)
     
@@ -79,7 +82,6 @@ def add_contact():
     if not user_id: return jsonify({'success': False, 'message': 'Não autorizado'}), 401
         
     data = request.get_json()
-    # Passa o user_id para a função do backend.
     success, message = crud_contatos.adicionar_contato(user_id, data['nome'], data['telefone'], data.get('email'))
     return jsonify({'success': success, 'message': message})
 
@@ -94,7 +96,6 @@ def update_contact(contact_id):
     if not contact_original:
          return jsonify({'success': False, 'message': 'Contato original não encontrado'}), 404
     
-    # Passa o user_id para a função do backend.
     success, message = crud_contatos.atualizar_contato(
         user_id, contact_original['telefone'], data['nome'], data['telefone'], data.get('email')
     )
@@ -110,7 +111,6 @@ def delete_contact(contact_id):
     if not contact_to_delete:
          return jsonify({'success': False, 'message': 'Contato não encontrado'}), 404
     
-    # Passa o user_id para a função do backend.
     success, message = crud_contatos.remover_contato_por_telefone(user_id, contact_to_delete['telefone'])
     return jsonify({'success': success, 'message': message})
 
