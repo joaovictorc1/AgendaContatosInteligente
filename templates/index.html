@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="h-full bg-gray-50">
+<!-- MUDANÇA: A classe 'dark' foi adicionada diretamente aqui para forçar o modo escuro -->
+<html lang="pt-BR" class="h-full dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -29,63 +30,70 @@
         }
         .toast.success { background-color: #28a745; }
         .toast.error { background-color: #dc3545; }
+        .view {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
-<body class="h-full flex items-center justify-center">
+<body class="h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-blue-50 dark:from-slate-900 dark:to-slate-800 transition-colors duration-300">
 
-    <div id="app" class="w-full max-w-4xl mx-auto p-4">
+    <div id="app" class="w-full max-w-5xl mx-auto p-4">
 
-        <!-- TELA DE LOGIN (sem alterações) -->
-        <div id="auth-view" class="bg-white p-8 rounded-2xl shadow-lg max-w-md mx-auto">
-            <h2 class="text-3xl font-bold text-center text-gray-800 mb-2">Agenda de Contatos</h2>
-            <p class="text-center text-gray-500 mb-8">Faça login ou registre-se para continuar</p>
-            <div id="auth-error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-6 hidden" role="alert">
-                <strong class="font-bold">Erro:</strong>
-                <span class="block sm:inline" id="auth-error-message"></span>
+        <!-- TELA DE LOGIN -->
+        <div id="auth-view" class="view bg-white dark:bg-slate-800 p-8 rounded-2xl shadow-xl max-w-md mx-auto">
+            <h2 class="text-3xl font-bold text-center text-gray-900 dark:text-gray-100 mb-2">Agenda de Contatos</h2>
+            <p class="text-center text-gray-600 dark:text-gray-400 mb-8">Faça login ou registre-se para continuar</p>
+            
+            <div id="auth-error" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg relative mb-6 hidden" role="alert">
+                <p class="font-bold">Erro de Autenticação</p>
+                <p id="auth-error-message"></p>
             </div>
+
             <form id="login-form">
                 <div>
-                    <label for="login-username" class="block text-sm font-medium text-gray-700">Usuário</label>
-                    <div class="mt-1">
-                        <input id="login-username" name="username" type="text" required class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                    </div>
+                    <label for="login-username" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Usuário</label>
+                    <input id="login-username" name="username" type="text" required class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-200 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                 </div>
                 <div class="mt-4">
-                    <label for="login-password" class="block text-sm font-medium text-gray-700">Senha</label>
-                    <div class="mt-1">
-                        <input id="login-password" name="password" type="password" required class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                    </div>
+                    <label for="login-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Senha</label>
+                    <input id="login-password" name="password" type="password" required class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-200 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                 </div>
                 <div class="mt-6">
-                    <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200">
                         Entrar
                     </button>
                 </div>
             </form>
-            <p class="mt-4 text-center text-sm text-gray-600">
+
+            <p class="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
                 Não tem uma conta?
-                <button id="show-register-btn" class="font-medium text-indigo-600 hover:text-indigo-500">
+                <button id="show-register-btn" class="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300">
                     Registre-se
                 </button>
             </p>
+
             <form id="register-form" class="hidden mt-6">
                  <div>
-                    <label for="register-username" class="block text-sm font-medium text-gray-700">Novo Usuário</label>
-                    <input id="register-username" name="username" type="text" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
+                    <label for="register-username" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Novo Usuário</label>
+                    <input id="register-username" name="username" type="text" required class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-md shadow-sm">
                 </div>
                  <div class="mt-4">
-                    <label for="register-password" class="block text-sm font-medium text-gray-700">Nova Senha</label>
-                    <input id="register-password" name="password" type="password" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
+                    <label for="register-password" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nova Senha</label>
+                    <input id="register-password" name="password" type="password" required class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-md shadow-sm">
                 </div>
                 <div class="mt-4">
-                    <label for="register-email" class="block text-sm font-medium text-gray-700">Email (Opcional)</label>
-                    <input id="register-email" name="email" type="email" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm">
+                    <label for="register-email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Email (Opcional)</label>
+                    <input id="register-email" name="email" type="email" class="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 rounded-md shadow-sm">
                 </div>
                 <div class="mt-6 flex gap-4">
-                    <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700">
+                    <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 transition-all duration-200">
                         Confirmar Registro
                     </button>
-                    <button type="button" id="cancel-register-btn" class="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                    <button type="button" id="cancel-register-btn" class="w-full flex justify-center py-2 px-4 border border-gray-300 dark:border-slate-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-slate-700 hover:bg-gray-50 dark:hover:bg-slate-600 transition-all duration-200">
                         Cancelar
                     </button>
                 </div>
@@ -93,54 +101,50 @@
         </div>
 
         <!-- TELA DA AGENDA -->
-        <div id="agenda-view" class="hidden">
-            <header class="bg-white shadow-sm rounded-t-2xl p-4 flex justify-between items-center">
+        <div id="agenda-view" class="hidden view">
+            <header class="bg-white dark:bg-slate-800 shadow-sm rounded-t-2xl p-4 flex justify-between items-center">
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-900">Minha Agenda</h1>
-                    <p class="text-sm text-gray-500">Logado como: <span id="current-user" class="font-semibold"></span></p>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Minha Agenda</h1>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">Logado como: <span id="current-user" class="font-semibold"></span></p>
                 </div>
-                <button id="logout-btn" class="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700">
+                <!-- BOTÃO DE MODO ESCURO REMOVIDO -->
+                <button id="logout-btn" class="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-all duration-200">
                     Sair
                 </button>
             </header>
             
-            <main class="bg-white p-6 rounded-b-2xl shadow-lg">
-                <!-- FORMULÁRIO DE ADICIONAR/EDITAR -->
-                <form id="contact-form" class="mb-6 p-4 border border-gray-200 rounded-lg">
-                    <h3 id="form-title" class="text-lg font-semibold mb-4 text-gray-800">Adicionar Novo Contato</h3>
+            <main class="bg-white dark:bg-slate-800 p-8 rounded-b-2xl shadow-xl">
+                <form id="contact-form" class="mb-8 p-6 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-700 rounded-lg">
+                    <h3 id="form-title" class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-200">Adicionar Novo Contato</h3>
                     <input type="hidden" id="contact-id">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <input id="contact-name" placeholder="Nome" required class="px-3 py-2 border border-gray-300 rounded-md">
-                        <input id="contact-phone" placeholder="Telefone" required class="px-3 py-2 border border-gray-300 rounded-md">
-                        <input id="contact-email" placeholder="Email" class="px-3 py-2 border border-gray-300 rounded-md">
+                        <input id="contact-name" placeholder="Nome" required class="px-3 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-200 rounded-md">
+                        <input id="contact-phone" placeholder="Telefone" required class="px-3 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-200 rounded-md">
+                        <input id="contact-email" placeholder="Email" class="px-3 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-200 rounded-md">
                     </div>
                     <div class="mt-4 flex gap-2">
-                        <button type="submit" class="py-2 px-4 rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700">Salvar</button>
-                        <button type="button" id="cancel-edit-btn" class="hidden py-2 px-4 rounded-md text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300">Cancelar Edição</button>
+                        <button type="submit" class="py-2 px-4 rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-all duration-200">Salvar Contato</button>
+                        <button type="button" id="cancel-edit-btn" class="hidden py-2 px-4 rounded-md text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 dark:text-gray-200 dark:bg-slate-600 dark:hover:bg-slate-500 transition-all duration-200">Cancelar Edição</button>
                     </div>
                 </form>
 
-                <!-- CAMPO DE BUSCA ADICIONADO AQUI -->
                 <div class="mb-4">
-                    <label for="search-box" class="sr-only">Buscar</label>
-                    <input type="search" id="search-box" placeholder="🔎 Buscar por nome ou telefone..." class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500">
+                    <input type="search" id="search-box" placeholder="🔎 Buscar por nome ou telefone..." class="w-full px-4 py-2 border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-200 rounded-md focus:ring-blue-500 focus:border-blue-500">
                 </div>
 
-                <!-- LISTA DE CONTATOS -->
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
+                    <table class="min-w-full">
+                        <thead class="bg-gray-100 dark:bg-slate-700">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Telefone</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Contato</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Telefone</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Email</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wider">Ações</th>
                             </tr>
                         </thead>
-                        <tbody id="contact-list" class="bg-white divide-y divide-gray-200">
-                        </tbody>
+                        <tbody id="contact-list" class="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700"></tbody>
                     </table>
-                     <p id="no-contacts" class="text-center py-8 text-gray-500 hidden">Nenhum contato encontrado.</p>
+                     <p id="no-contacts" class="text-center py-8 text-gray-500 dark:text-gray-400 hidden">Nenhum contato encontrado.</p>
                 </div>
             </main>
         </div>
@@ -148,9 +152,9 @@
     <div id="toast" class="toast"></div>
     
     <script>
+    // SCRIPT SIMPLIFICADO: A lógica de troca de tema foi removida.
     document.addEventListener('DOMContentLoaded', () => {
         const app = {
-            // ... (elementos da UI como antes) ...
             views: { auth: document.getElementById('auth-view'), agenda: document.getElementById('agenda-view') },
             auth: {
                 loginForm: document.getElementById('login-form'),
@@ -175,13 +179,19 @@
                 contactPhone: document.getElementById('contact-phone'),
                 contactEmail: document.getElementById('contact-email'),
                 cancelEditBtn: document.getElementById('cancel-edit-btn'),
-                searchBox: document.getElementById('search-box'), // Elemento de busca
+                searchBox: document.getElementById('search-box'),
                 contactList: document.getElementById('contact-list'),
                 noContactsMsg: document.getElementById('no-contacts'),
             },
             toast: document.getElementById('toast'),
-            searchTimeout: null, // Para controle do debounce da busca
+            searchTimeout: null,
 
+            init() {
+                this.bindAuthEvents();
+                this.bindAgendaEvents();
+                this.checkLoginStatus();
+            },
+            
             async apiCall(endpoint, method = 'GET', body = null) {
                 const options = { method, headers: { 'Content-Type': 'application/json' } };
                 if (body) { options.body = JSON.stringify(body); }
@@ -194,125 +204,91 @@
                 }
             },
 
-            init() {
-                this.bindAuthEvents();
-                this.bindAgendaEvents();
-                this.checkLoginStatus();
-            },
-
             bindAuthEvents() {
-                // ... (eventos de autenticação como antes) ...
                 this.auth.loginForm.addEventListener('submit', async (e) => {
                     e.preventDefault();
-                    const username = this.auth.loginUsername.value;
-                    const password = this.auth.loginPassword.value;
-                    const data = await this.apiCall('/login', 'POST', { username, password });
-                    if (data.success) { this.showAgendaView(data.user); } 
-                    else { this.showAuthError(data.message); }
+                    const data = await this.apiCall('/login', 'POST', { username: this.auth.loginUsername.value, password: this.auth.loginPassword.value });
+                    if (data.success) { this.showAgendaView(data.user); } else { this.showAuthError(data.message); }
                 });
-
                 this.auth.registerForm.addEventListener('submit', async (e) => {
                     e.preventDefault();
-                    const username = this.auth.registerUsername.value;
-                    const password = this.auth.registerPassword.value;
-                    const email = this.auth.registerEmail.value;
-                    const data = await this.apiCall('/register', 'POST', { username, password, email });
+                    const data = await this.apiCall('/register', 'POST', { username: this.auth.registerUsername.value, password: this.auth.registerPassword.value, email: this.auth.registerEmail.value });
                     if (data.success) {
                         this.showToast('Usuário registrado com sucesso! Faça o login.');
                         this.toggleRegisterForm(false);
                         this.auth.registerForm.reset();
                         this.auth.loginForm.reset();
-                        this.auth.loginUsername.value = username;
+                        this.auth.loginUsername.value = this.auth.registerUsername.value;
                     } else { this.showToast(data.message, 'error'); }
                 });
-
                 this.auth.showRegisterBtn.addEventListener('click', () => this.toggleRegisterForm(true));
                 this.auth.cancelRegisterBtn.addEventListener('click', () => this.toggleRegisterForm(false));
             },
-
+            
             bindAgendaEvents() {
-                // ... (eventos de logout e formulário de contato como antes) ...
-                this.agenda.logoutBtn.addEventListener('click', async () => {
-                    await this.apiCall('/logout');
-                    this.showAuthView();
-                });
-
+                this.agenda.logoutBtn.addEventListener('click', async () => { await this.apiCall('/logout'); this.showAuthView(); });
                 this.agenda.contactForm.addEventListener('submit', async (e) => {
                     e.preventDefault();
                     const id = this.agenda.contactId.value;
-                    const contactData = {
-                        nome: this.agenda.contactName.value,
-                        telefone: this.agenda.contactPhone.value,
-                        email: this.agenda.contactEmail.value,
-                    };
-                    let data; 
-                    if (id) { data = await this.apiCall(`/api/contacts/${id}`, 'PUT', contactData); } 
+                    const contactData = { nome: this.agenda.contactName.value, telefone: this.agenda.contactPhone.value, email: this.agenda.contactEmail.value, };
+                    let data;
+                    if (id) { data = await this.apiCall(`/api/contacts/${id}`, 'PUT', contactData); }
                     else { data = await this.apiCall('/api/contacts', 'POST', contactData); }
                     this.showToast(data.message, data.success ? 'success' : 'error');
-                    if (data.success) {
-                         this.resetForm();
-                         this.loadContacts();
-                    }
+                    if (data.success) { this.resetForm(); this.loadContacts(); }
                 });
-
                 this.agenda.cancelEditBtn.addEventListener('click', () => this.resetForm());
-
-                // --- EVENTO DE BUSCA ADICIONADO ---
                 this.agenda.searchBox.addEventListener('input', () => {
-                    clearTimeout(this.searchTimeout); // Cancela a busca anterior se o usuário ainda está digitando
-                    // Espera 300ms após o usuário parar de digitar para fazer a busca
-                    this.searchTimeout = setTimeout(() => {
-                        this.loadContacts(this.agenda.searchBox.value);
-                    }, 300);
+                    clearTimeout(this.searchTimeout);
+                    this.searchTimeout = setTimeout(() => { this.loadContacts(this.agenda.searchBox.value); }, 300);
                 });
-            },
-
-            showAuthView() { this.views.auth.classList.remove('hidden'); this.views.agenda.classList.add('hidden'); },
-            showAgendaView(user) {
-                this.views.agenda.classList.remove('hidden');
-                this.views.auth.classList.add('hidden');
-                this.agenda.currentUser.textContent = user.username;
-                this.loadContacts();
-            },
-            showAuthError(message) { this.auth.authErrorMessage.textContent = message; this.auth.authError.classList.remove('hidden'); },
-            toggleRegisterForm(show) {
-                this.auth.loginForm.classList.toggle('hidden', show);
-                this.auth.registerForm.classList.toggle('hidden', !show);
-                this.auth.showRegisterBtn.parentElement.classList.toggle('hidden', show);
             },
             
-            // --- LÓGICA DE CARREGAR CONTATOS ATUALIZADA ---
+            showAuthView() { this.views.auth.classList.remove('hidden', 'view'); this.views.agenda.classList.add('hidden'); setTimeout(() => { this.views.auth.classList.add('view') }, 10); },
+            showAgendaView(user) { this.views.agenda.classList.remove('hidden', 'view'); this.views.auth.classList.add('hidden'); setTimeout(() => { this.views.agenda.classList.add('view') }, 10); this.agenda.currentUser.textContent = user.username; this.loadContacts(); },
+            showAuthError(message) { this.auth.authErrorMessage.textContent = message; this.auth.authError.classList.remove('hidden'); },
+            toggleRegisterForm(show) { this.auth.loginForm.classList.toggle('hidden', show); this.auth.registerForm.classList.toggle('hidden', !show); this.auth.showRegisterBtn.parentElement.classList.toggle('hidden', show); },
+            
             async loadContacts(query = '') {
-                // A URL agora pode incluir um parâmetro de busca
                 const url = query ? `/api/contacts?q=${encodeURIComponent(query)}` : '/api/contacts';
                 const data = await this.apiCall(url);
-                
                 this.renderContactList(data);
             },
 
             renderContactList(data) {
                 this.agenda.contactList.innerHTML = '';
                 this.agenda.noContactsMsg.classList.toggle('hidden', !data.success || data.contacts.length > 0);
-
                 if (data.success && data.contacts.length > 0) {
-                    data.contacts.forEach(contact => {
+                    data.contacts.forEach((contact, index) => {
                         const row = document.createElement('tr');
+                        row.classList.add('hover:bg-blue-100', 'dark:hover:bg-slate-700', 'transition-colors', 'duration-150');
+                        if (index % 2 !== 0) { row.classList.add('bg-gray-50', 'dark:bg-slate-900/50'); }
+                        const nameParts = contact.nome.split(' ');
+                        const initials = (nameParts[0] ? nameParts[0][0] : '') + (nameParts.length > 1 ? nameParts[nameParts.length - 1][0] : '');
                         row.innerHTML = `
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${contact.nome}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${contact.telefone}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${contact.email || ''}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10">
+                                        <div class="w-10 h-10 rounded-full bg-blue-200 dark:bg-blue-900 text-blue-800 dark:text-blue-200 flex items-center justify-center font-bold text-sm">${initials.toUpperCase()}</div>
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900 dark:text-gray-100">${contact.nome}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${contact.telefone}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${contact.email || ''}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                <button data-id="${contact.id}" class="edit-btn text-indigo-600 hover:text-indigo-900 mr-4">Editar</button>
-                                <button data-id="${contact.id}" data-name="${contact.nome}" class="delete-btn text-red-600 hover:text-red-900">Excluir</button>
+                                <button data-id="${contact.id}" class="edit-btn text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 mr-4">Editar</button>
+                                <button data-id="${contact.id}" data-name="${contact.nome}" class="delete-btn text-red-600 hover:text-red-900 dark:text-red-500 dark:hover:text-red-400">Excluir</button>
                             </td>`;
                         this.agenda.contactList.appendChild(row);
                     });
                 }
                 this.bindTableButtons();
             },
-
+            
             bindTableButtons() {
-                // ... (binds dos botões de editar/excluir como antes) ...
                 document.querySelectorAll('.edit-btn').forEach(button => {
                     button.addEventListener('click', async (e) => {
                         const id = e.target.dataset.id;
@@ -335,32 +311,17 @@
                         if (confirm(`Tem certeza que deseja excluir ${name}?`)) {
                             const data = await this.apiCall(`/api/contacts/${id}`, 'DELETE');
                             this.showToast(data.message, data.success ? 'success' : 'error');
-                            // Após deletar, recarrega a lista com o termo de busca atual
                             this.loadContacts(this.agenda.searchBox.value);
                         }
                     });
                 });
             },
-
-            resetForm() {
-                this.agenda.contactForm.reset();
-                this.agenda.contactId.value = '';
-                this.agenda.formTitle.textContent = 'Adicionar Novo Contato';
-                this.agenda.cancelEditBtn.classList.add('hidden');
-            },
-
-            async checkLoginStatus() {
-                const data = await this.apiCall('/check_status');
-                if (data.logged_in) { this.showAgendaView(data.user); } 
-                else { this.showAuthView(); }
-            },
             
-            showToast(message, type = 'success') {
-                this.toast.textContent = message;
-                this.toast.className = `toast ${type} show`;
-                setTimeout(() => { this.toast.classList.remove('show'); }, 3000);
-            },
+            resetForm() { this.agenda.contactForm.reset(); this.agenda.contactId.value = ''; this.agenda.formTitle.textContent = 'Adicionar Novo Contato'; this.agenda.cancelEditBtn.classList.add('hidden'); },
+            async checkLoginStatus() { const data = await this.apiCall('/check_status'); if (data.logged_in) { this.showAgendaView(data.user); } else { this.showAuthView(); } },
+            showToast(message, type = 'success') { this.toast.textContent = message; this.toast.className = `toast ${type} show`; setTimeout(() => { this.toast.classList.remove('show'); }, 3000); },
         };
+        
         app.init();
     });
     </script>
