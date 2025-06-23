@@ -1,22 +1,31 @@
-# .gitignore
+# Arquivos de Ambiente e Credenciais
+# NUNCA envie este arquivo para o repositório! Contém suas senhas.
+.env
+.env.*
 
-# Arquivos de banco de dados local SQLite
+# Banco de Dados Local (caso use SQLite para testes)
+# Este arquivo é gerado localmente e não deve ser compartilhado.
+agenda.db
 *.db
 *.sqlite
 *.sqlite3
-agenda.db
 
-# Caches e arquivos compilados do Python
+# Arquivos de Cache e Compilados do Python
+# Gerados automaticamente pelo Python, não são parte do código fonte.
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
-# Pastas de ambiente virtual
-.venv
-venv
-env
+# Pastas de Ambiente Virtual
+# Cada desenvolvedor cria seu próprio ambiente virtual.
+.venv/
+venv/
+venv.bak/
+env/
+env.bak/
 
-# Arquivos de sistema operacional
+# Arquivos de Sistema Operacional
+# Arquivos de metadados gerados pelo macOS e Windows.
 .DS_Store
 Thumbs.db
